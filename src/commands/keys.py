@@ -1,23 +1,29 @@
 from src.discord_client import *
 
 MESSAGES = {
-    "godly": """Godly key: **ZEUS**
+    "godly": """ 
+Boss name: **ZEUS**
 Attack style: 🛡️Magic
 Attack style weakness: ⚔️Archery""",
-    "stone": """Stone key: **Medusa**
+    "stone": """ 
+Boss name: **Medusa**
 Attack style: 🛡️Archery
 Attack style weakness: ⚔️Slash""",
-    "underworld": """Underworld key: **Hades**
+    "underworld": """ 
+Boss name: **Hades**
 Attack style: 🛡️Magic
 Attack style weakness: Stab""",
-    "mountain": """Mountain key: **Griffin**
+    "mountain": """ 
+Boss name: **Griffin**
 Attack style: 🛡️Melee
 Attack style weakness: ⚔️Crush
 """,
-    "burning": """Burning key: **Devil**
+    "burning": """ 
+Boss name: **Devil**
 Attack style: 🛡️Melee
 Attack style weakness: ⚔️Pound""",
-    "mutated": """Mutated key: **Chimera**
+    "mutated": """
+Boss name: **Chimera**
 Attack style: 🛡️Melee
 Attack style weakness: ⚔️Magic"""
 }
@@ -35,9 +41,12 @@ async def boss(
     name: str,
     just_for_me: bool = False,
 ) -> None:
+    embed = discord.Embed()
     message = MESSAGES.get(name.lower())
     message = message if message else "No bosses associated with this value"
-    await interaction.response.send_message(content=message, ephemeral=just_for_me)
+    embed.title = name.capitalize() + " key:"
+    embed.description = message
+    await interaction.response.send_message(embeds=[embed], ephemeral=just_for_me)
 
 @boss.autocomplete("name")
 async def boss_autocomplete(

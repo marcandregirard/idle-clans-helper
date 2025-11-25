@@ -1,35 +1,23 @@
 from src.discord_client import *
+from src.models import BossEntry
 
 KEYS_INFORMATION = {
-    "godly": {"description": """ 
-Boss name: **ZEUS**
-Attack style: 🛡️Magic
-Attack style weakness: ⚔️Archery""", "wiki": "Zeus", "trim_color": discord.Color.gold()},
-    "stone": {"description": """ 
-Boss name: **Medusa**
-Attack style: 🛡️Archery
-Attack style weakness: ⚔️Slash""", "wiki": "Medusa", "trim_color": discord.Color.light_grey()},
-    "underworld": {"description": """ 
-Boss name: **Hades**
-Attack style: 🛡️Magic
-Attack style weakness: Stab""", "wiki": "Hades", "trim_color": discord.Color.blue()},
-    "mountain": {"description": """ 
-Boss name: **Griffin**
-Attack style: 🛡️Melee
-Attack style weakness: ⚔️Crush
-""", "wiki": "Griffin", "trim_color": discord.Color.dark_gold()},
-    "burning": {"description": """ 
-Boss name: **Devil**
-Attack style: 🛡️Melee
-Attack style weakness: ⚔️Pound""", "wiki": "Devil", "trim_color": discord.Color.red()},
-    "mutated": {"description": """
-Boss name: **Chimera**
-Attack style: 🛡️Melee
-Attack style weakness: ⚔️Magic""", "wiki": "Chimera", "trim_color": discord.Color.green()}
+    "godly": BossEntry(name="ZEUS", attack_style="Magic", attack_weakness="Archery", wiki="Zeus",
+                       trim_color=discord.Color.gold()),
+    "stone": BossEntry(name="Medusa", attack_style="Archery", attack_weakness="Slash", wiki="Medusa",
+                       trim_color=discord.Color.light_grey()),
+    "underworld": BossEntry(name="Hades",  attack_style="Magic", attack_weakness="Stab", wiki="Hades",
+                            trim_color=discord.Color.blue()),
+    "mountain": BossEntry(name="Griffin", attack_style="Melee", attack_weakness="Crush", wiki="Griffin",
+                          trim_color=discord.Color.dark_gold()),
+    "burning": BossEntry(name="Devil", attack_style="Melee", attack_weakness="Pound", wiki="Devil",
+                         trim_color=discord.Color.red()),
+    "mutated": BossEntry(name="Chimera", attack_style="Melee", attack_weakness="Magic", wiki="Chimera",
+                         trim_color=discord.Color.green())
 }
 
 
-@tree.command(name="keys", description="Find a boss")
+@tree.command(name="keys", description="Find a boss information by its key")
 @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @discord.app_commands.allowed_installs(guilds=True, users=True)
 @discord.app_commands.describe(
@@ -43,10 +31,16 @@ async def boss(
 ) -> None:
     embed = discord.Embed()
     key = KEYS_INFORMATION.get(name.lower())
-    embed.title = name.capitalize() + " key:"
-    embed.description = key["description"]
-    embed.url = "https://wiki.idleclans.com/index.php/" + key["wiki"]
-    embed.color = key["trim_color"]
+    if key is None:
+        await interaction.response.send_message(f"Unknown key: {name}", ephemeral=just_for_me)
+        return
+    embed.title = name.capitalize() + " key"
+    embed.description = f""" 
+**{key.name}**
+Attack style: 🛡️{key.attack_style}
+Attack style weakness: ⚔️{key.attack_weakness}"""
+    embed.url = "https://wiki.idleclans.com/index.php/" + key.wiki
+    embed.color = key.trim_color
     await interaction.response.send_message(embeds=[embed], ephemeral=just_for_me)
 
 

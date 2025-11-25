@@ -29,7 +29,7 @@ Attack style weakness: ⚔️Magic"""
 }
 
 
-@tree.command(name="boss", description="Find a boss")
+@tree.command(name="boss", description="Find a boss information by its name")
 @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @discord.app_commands.allowed_installs(guilds=True, users=True)
 @discord.app_commands.describe(

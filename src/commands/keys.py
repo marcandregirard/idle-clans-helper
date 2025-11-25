@@ -1,31 +1,31 @@
 from src.discord_client import *
 
-MESSAGES = {
-    "godly": """ 
+KEYS_INFORMATION = {
+    "godly": {"description": """ 
 Boss name: **ZEUS**
 Attack style: 🛡️Magic
-Attack style weakness: ⚔️Archery""",
-    "stone": """ 
+Attack style weakness: ⚔️Archery""", "wiki": "Zeus", "trim_color": discord.Color.gold()},
+    "stone": {"description": """ 
 Boss name: **Medusa**
 Attack style: 🛡️Archery
-Attack style weakness: ⚔️Slash""",
-    "underworld": """ 
+Attack style weakness: ⚔️Slash""", "wiki": "Medusa", "trim_color": discord.Color.light_grey()},
+    "underworld": {"description": """ 
 Boss name: **Hades**
 Attack style: 🛡️Magic
-Attack style weakness: Stab""",
-    "mountain": """ 
+Attack style weakness: Stab""", "wiki": "Hades", "trim_color": discord.Color.blue()},
+    "mountain": {"description": """ 
 Boss name: **Griffin**
 Attack style: 🛡️Melee
 Attack style weakness: ⚔️Crush
-""",
-    "burning": """ 
+""", "wiki": "Griffin", "trim_color": discord.Color.dark_gold()},
+    "burning": {"description": """ 
 Boss name: **Devil**
 Attack style: 🛡️Melee
-Attack style weakness: ⚔️Pound""",
-    "mutated": """
+Attack style weakness: ⚔️Pound""", "wiki": "Devil", "trim_color": discord.Color.red()},
+    "mutated": {"description": """
 Boss name: **Chimera**
 Attack style: 🛡️Melee
-Attack style weakness: ⚔️Magic"""
+Attack style weakness: ⚔️Magic""", "wiki": "Chimera", "trim_color": discord.Color.green()}
 }
 
 
@@ -37,25 +37,27 @@ Attack style weakness: ⚔️Magic"""
     just_for_me="Only show the definition to me. (Default: False)",
 )
 async def boss(
-    interaction: discord.Interaction,
-    name: str,
-    just_for_me: bool = False,
+        interaction: discord.Interaction,
+        name: str,
+        just_for_me: bool = False,
 ) -> None:
     embed = discord.Embed()
-    message = MESSAGES.get(name.lower())
-    message = message if message else "No bosses associated with this value"
+    key = KEYS_INFORMATION.get(name.lower())
     embed.title = name.capitalize() + " key:"
-    embed.description = message
+    embed.description = key["description"]
+    embed.url = "https://wiki.idleclans.com/index.php/" + key["wiki"]
+    embed.color = key["trim_color"]
     await interaction.response.send_message(embeds=[embed], ephemeral=just_for_me)
+
 
 @boss.autocomplete("name")
 async def boss_autocomplete(
-    interaction: discord.Interaction,
-    current: str,
+        interaction: discord.Interaction,
+        current: str,
 ) -> list[discord.app_commands.Choice[str]]:
     choices = [
         discord.app_commands.Choice(name=key.capitalize(), value=key)
-        for key in MESSAGES.keys()
+        for key in KEYS_INFORMATION.keys()
         if current.lower() in key.lower()
     ]
     return choices[:25]

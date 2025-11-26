@@ -1,4 +1,5 @@
 from src.discord_client import *
+from src.models import BossEntry,ALL_BOSSES
 
 # Build the mapping from key -> BossEntry based on the 'key' field
 BOSSES_INFORMATION = {entry.name: entry for entry in ALL_BOSSES}

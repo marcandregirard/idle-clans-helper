@@ -18,7 +18,7 @@ async def boss(
     just_for_me: bool = False,
 ) -> None:
     embed = discord.Embed()
-    key = KEYS_INFORMATION.get(name.lower())
+    key = BOSSES_INFORMATION.get(name.lower())
     if key is None:
         await interaction.response.send_message(f"Unknown key: {name}", ephemeral=just_for_me)
         return

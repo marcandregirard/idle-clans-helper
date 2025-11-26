@@ -1,32 +1,7 @@
 from src.discord_client import *
 
-MESSAGES = {
-    "zeus": """
-Key needed: **Godly**
-Attack style: 🛡️Magic
-Attack style weakness: ⚔️Archery""",
-    "medusa": """
-Key needed: **Stone**
-Attack style: 🛡️Archery
-Attack style weakness: ⚔️Slash""",
-    "hades": """
-Key needed: **Underworld**
-Attack style: 🛡️Magic
-Attack style weakness: Stab""",
-    "griffin": """
-Key needed: **Mountain**
-Attack style: 🛡️Melee
-Attack style weakness: ⚔️Crush
-""",
-    "devil": """
-Key needed: **Burning**
-Attack style: 🛡️Melee
-Attack style weakness: ⚔️Pound""",
-    "chimera": """
-Key  needed: **Mutated** 
-Attack style: 🛡️Melee
-Attack style weakness: ⚔️Magic"""
-}
+# Build the mapping from key -> BossEntry based on the 'key' field
+BOSSES_INFORMATION = {entry.name: entry for entry in ALL_BOSSES}
 
 
 @tree.command(name="boss", description="Find a boss information by its name")
@@ -42,20 +17,27 @@ async def boss(
     just_for_me: bool = False,
 ) -> None:
     embed = discord.Embed()
-    message = MESSAGES.get(name.lower())
-    message = message if message else "No bosses associated with this value"
-    embed.title = name.capitalize() + " :"
-    embed.description = message
+    key = KEYS_INFORMATION.get(name.lower())
+    if key is None:
+        await interaction.response.send_message(f"Unknown key: {name}", ephemeral=just_for_me)
+        return
+    embed.title = name.capitalize() + " key"
+    embed.description = f"""
+    **{key.name}**
+    Attack style: 🛡️{key.attack_style}
+    Attack style weakness: ⚔️{key.attack_weakness}"""
+    embed.url = "https://wiki.idleclans.com/index.php/" + key.wiki
+    embed.color = key.trim_color
     await interaction.response.send_message(embeds=[embed], ephemeral=just_for_me)
 
 @boss.autocomplete("name")
 async def boss_autocomplete(
     interaction: discord.Interaction,
     current: str,
-) -> list[discord.app_commands.Choice[str]]:
+) -> list[discord.app_commands.Choice]:
     choices = [
         discord.app_commands.Choice(name=key.capitalize(), value=key)
-        for key in MESSAGES.keys()
+        for key in BOSSES_INFORMATION.keys()
         if current.lower() in key.lower()
     ]
     return choices[:25]

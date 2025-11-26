@@ -1,20 +1,8 @@
 from src.discord_client import *
-from src.models import BossEntry
+from src.models import BossEntry,ALL_BOSSES
 
-KEYS_INFORMATION = {
-    "godly": BossEntry(name="ZEUS", attack_style="Magic", attack_weakness="Archery", wiki="Zeus",
-                       trim_color=discord.Color.gold()),
-    "stone": BossEntry(name="Medusa", attack_style="Archery", attack_weakness="Slash", wiki="Medusa",
-                       trim_color=discord.Color.light_grey()),
-    "underworld": BossEntry(name="Hades",  attack_style="Magic", attack_weakness="Stab", wiki="Hades",
-                            trim_color=discord.Color.blue()),
-    "mountain": BossEntry(name="Griffin", attack_style="Melee", attack_weakness="Crush", wiki="Griffin",
-                          trim_color=discord.Color.dark_gold()),
-    "burning": BossEntry(name="Devil", attack_style="Melee", attack_weakness="Pound", wiki="Devil",
-                         trim_color=discord.Color.red()),
-    "mutated": BossEntry(name="Chimera", attack_style="Melee", attack_weakness="Magic", wiki="Chimera",
-                         trim_color=discord.Color.green())
-}
+# Build the mapping from key -> BossEntry based on the 'key' field
+KEYS_INFORMATION = {entry.key: entry for entry in ALL_BOSSES}
 
 
 @tree.command(name="keys", description="Find a boss information by its key")
@@ -35,7 +23,7 @@ async def boss(
         await interaction.response.send_message(f"Unknown key: {name}", ephemeral=just_for_me)
         return
     embed.title = name.capitalize() + " key"
-    embed.description = f""" 
+    embed.description = f"""
 **{key.name}**
 Attack style: 🛡️{key.attack_style}
 Attack style weakness: ⚔️{key.attack_weakness}"""
@@ -48,7 +36,7 @@ Attack style weakness: ⚔️{key.attack_weakness}"""
 async def boss_autocomplete(
         interaction: discord.Interaction,
         current: str,
-) -> list[discord.app_commands.Choice[str]]:
+) -> list[discord.app_commands.Choice]:
     choices = [
         discord.app_commands.Choice(name=key.capitalize(), value=key)
         for key in KEYS_INFORMATION.keys()

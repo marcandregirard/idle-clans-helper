@@ -24,7 +24,7 @@ async def boss(
         return
     embed.title = name.capitalize() + " key"
     embed.description = f"""
-**{key.name}**
+**{key.name.capitalize()}**
 Attack style: 🛡️{key.attack_style}
 Attack style weakness: ⚔️{key.attack_weakness}"""
     embed.url = "https://wiki.idleclans.com/index.php/" + key.wiki

@@ -18,17 +18,17 @@ async def boss(
     just_for_me: bool = False,
 ) -> None:
     embed = discord.Embed()
-    key = BOSSES_INFORMATION.get(name.lower())
-    if key is None:
-        await interaction.response.send_message(f"Unknown key: {name}", ephemeral=just_for_me)
+    entry = BOSSES_INFORMATION.get(name.lower())
+    if entry is None:
+        await interaction.response.send_message(f"Unknown boss: {name}", ephemeral=just_for_me)
         return
-    embed.title = name.capitalize() + " key"
+    embed.title = name.capitalize()
     embed.description = f"""
-    **{key.name.capitalize()}**
-    Attack style: 🛡️{key.attack_style}
-    Attack style weakness: ⚔️{key.attack_weakness}"""
-    embed.url = "https://wiki.idleclans.com/index.php/" + key.wiki
-    embed.color = key.trim_color
+    Key needed: **{entry.key.capitalize()}**
+    Attack style: 🛡️{entry.attack_style}
+    Attack style weakness: ⚔️{entry.attack_weakness}"""
+    embed.url = "https://wiki.idleclans.com/index.php/" + entry.wiki
+    embed.color = entry.trim_color
     await interaction.response.send_message(embeds=[embed], ephemeral=just_for_me)
 
 @boss.autocomplete("name")

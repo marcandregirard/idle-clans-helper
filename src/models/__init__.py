@@ -17,4 +17,10 @@ ALL_BOSSES = [
               trim_color=discord.Color.red(), key="burning"),
     BossEntry(name="chimera", attack_style="Melee", attack_weakness="Magic", wiki="Chimera",
               trim_color=discord.Color.green(), key="mutated"),
+    BossEntry(name="sobek", attack_style="Archery", attack_weakness="None", wiki="Sobek",
+              trim_color=discord.Color.green(), key="ancient"),
+    BossEntry(name="kronos", attack_style="Archery,Magic,Melee", attack_weakness="Differs(Archery,Magic,Melee)", wiki="Kronos",
+              trim_color=discord.Color.green(), key="krono's book"),
+    BossEntry(name="mesines", attack_style="Melee/Magic", attack_weakness="Archery", wiki="Mesines",
+              trim_color=discord.Color.green(), key="otherworldly"),
 ]

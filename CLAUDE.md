@@ -28,7 +28,7 @@ docker build -t idle-clans-helper .
 docker run idle-clans-helper
 ```
 
-Requires a `.env` file with `TOKEN` and `DATABASE_URL` (see `.env.example`).
+Requires a `.env` file with `TOKEN`, `DATABASE_URL`, and optionally `CLAN_LOG_URL` and `CLAN_MESSAGE_CHANNEL` (see `.env.example`).
 
 No test suite or linter is configured.
 
@@ -39,6 +39,7 @@ No test suite or linter is configured.
 - **`src/commands/`** — Each file defines one slash command registered on the shared `tree`. Currently: `/boss` (lookup by boss name) and `/keys` (lookup by key name). Both support autocomplete and ephemeral responses.
 - **`src/models/`** — `BossEntry` dataclass and the `ALL_BOSSES` list containing all boss data. This is the single source of truth for game data.
 - **`src/db/`** — Database layer. `base.py` (SQLAlchemy declarative base), `models.py` (ORM models), `engine.py` (async engine and session factory). DB connectivity is verified in `on_ready` via `init_db()`.
+- **`src/tasks/`** — Background tasks started in `on_ready` via `discord.ext.tasks`. `clanlog_fetcher.py` polls the Idle Clans API (bulk every 24h, recent every 1min), `message_sender.py` sends unsent messages to Discord every 30s, `gold_donation.py` posts celebration embeds for large gold donations.
 
 ### Adding a new boss
 

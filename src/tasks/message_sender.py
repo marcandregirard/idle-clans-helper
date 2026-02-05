@@ -7,7 +7,7 @@ import discord
 from discord.ext import tasks
 from sqlalchemy import select, update
 
-from src.db import async_session, ClanMessage
+from src.db import async_session, ClanLog
 from src.tasks.gold_donation import check_gold_donation
 
 DEFAULT_CHANNEL = "testing-ground"
@@ -20,7 +20,7 @@ def _find_channel_by_name(client: discord.Client, name: str) -> discord.TextChan
     return None
 
 
-def _format_message(msg: ClanMessage) -> str:
+def _format_message(msg: ClanLog) -> str:
     est = ZoneInfo("America/New_York")
     est_time = msg.timestamp.astimezone(est)
     return f"`[{est_time.strftime('%b %e %H:%M')}]` {msg.message}"
@@ -35,9 +35,9 @@ async def _send_pending(client: discord.Client) -> None:
 
     async with async_session() as db:
         stmt = (
-            select(ClanMessage)
-            .where(ClanMessage.message_sent == False)  # noqa: E712
-            .order_by(ClanMessage.timestamp.asc())
+            select(ClanLog)
+            .where(ClanLog.message_sent == False)  # noqa: E712
+            .order_by(ClanLog.timestamp.asc())
             .limit(10)
         )
         result = await db.execute(stmt)
@@ -61,8 +61,8 @@ async def _send_pending(client: discord.Client) -> None:
 
         if sent_ids:
             await db.execute(
-                update(ClanMessage)
-                .where(ClanMessage.id.in_(sent_ids))
+                update(ClanLog)
+                .where(ClanLog.id.in_(sent_ids))
                 .values(message_sent=True)
             )
             await db.commit()

@@ -6,8 +6,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 from .base import Base
 
 
-class ClanMessage(Base):
-    __tablename__ = "clan_messages"
+class ClanLog(Base):
+    __tablename__ = "clan_logs"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     clan_name: Mapped[str] = mapped_column(nullable=False)
@@ -19,6 +19,6 @@ class ClanMessage(Base):
     __table_args__ = (
         UniqueConstraint(
             "clan_name", "member_username", "message", "timestamp",
-            name="uq_clan_message_identity",
+            name="uq_clan_log_identity",
         ),
     )

@@ -7,7 +7,7 @@ import aiohttp
 from discord.ext import tasks
 from sqlalchemy.dialects.postgresql import insert
 
-from src.db import async_session, ClanMessage
+from src.db import async_session, ClanLog
 
 DEFAULT_CLAN_LOG_URL = "https://query.idleclans.com/api/Clan/logs/clan/KlutzCo"
 
@@ -103,10 +103,10 @@ async def fetch_and_store(url: str) -> None:
         async with async_session() as db:
             for msg in parsed:
                 stmt = (
-                    insert(ClanMessage)
+                    insert(ClanLog)
                     .values(**msg)
                     .on_conflict_do_nothing(
-                        constraint="uq_clan_message_identity",
+                        constraint="uq_clan_log_identity",
                     )
                 )
                 result = await db.execute(stmt)

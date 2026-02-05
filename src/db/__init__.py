@@ -1,5 +1,5 @@
 from .base import Base
 from .engine import async_session, engine, init_db
-from .models import ClanMessage
+from .models import ClanLog
 
-__all__ = ["Base", "engine", "async_session", "init_db", "ClanMessage"]
+__all__ = ["Base", "engine", "async_session", "init_db", "ClanLog"]

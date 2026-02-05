@@ -1,4 +1,5 @@
 import logging
+import os
 import re
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -6,6 +7,8 @@ from zoneinfo import ZoneInfo
 import discord
 
 from src.tasks.utils import find_channel_by_name
+
+DEFAULT_CHANNEL = "general"
 
 MEMBER_TO_DISCORD = {
     "ImaKlutz": "ImaKlutz",
@@ -42,9 +45,10 @@ async def check_gold_donation(
     if amount < _MIN_AMOUNT:
         return
 
-    channel = find_channel_by_name(client, "general")
+    channel_name = os.getenv("GOLD_DONATION_CHANNEL", DEFAULT_CHANNEL)
+    channel = find_channel_by_name(client, channel_name)
     if channel is None:
-        logging.warning("[gold_donation] #general channel not found")
+        logging.warning("[gold_donation] channel %s not found", channel_name)
         return
 
     est = ZoneInfo("America/New_York")

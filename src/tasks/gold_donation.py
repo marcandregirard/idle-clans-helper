@@ -13,7 +13,7 @@ MEMBER_TO_DISCORD = {
     "yothos": "yothos",
     "Choufleur": "Steph",
     "g4m3f4c3": "g4m3f4c3",
-    "Oliiviier": "K.",
+    "Oliiviier": "oli",
 }
 
 _GOLD_PATTERN = re.compile(r"^(.+?)\s+added\s+(\d+)x\s+Gold\.$")

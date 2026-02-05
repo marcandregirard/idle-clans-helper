@@ -7,10 +7,16 @@ import discord
 from discord.ext import tasks
 from sqlalchemy import select, update
 
-from src.db import async_session, ClanLog
+from src.db import async_session, ClanLog, ClanLogType
 from src.tasks.gold_donation import check_gold_donation
 
 DEFAULT_CHANNEL = "corporate-oversight"
+
+_SKIP_TYPES = {
+    ClanLogType.EVENT_STARTED,
+    ClanLogType.COMBAT_QUEST_COMPLETED,
+    ClanLogType.SKILLING_QUEST_COMPLETED,
+}
 
 
 def _find_channel_by_name(client: discord.Client, name: str) -> discord.TextChannel | None:
@@ -49,6 +55,10 @@ async def _send_pending(client: discord.Client) -> None:
 
     sent_ids: list[int] = []
     for msg in messages:
+        if msg.log_type in _SKIP_TYPES:
+            sent_ids.append(msg.id)
+            continue
+
         text = _format_message(msg)
         try:
             await channel.send(text)
@@ -57,7 +67,8 @@ async def _send_pending(client: discord.Client) -> None:
             continue
 
         sent_ids.append(msg.id)
-        await check_gold_donation(client, msg.message, msg.timestamp)
+        if msg.log_type == ClanLogType.VAULT_DEPOSIT:
+            await check_gold_donation(client, msg.message, msg.timestamp)
         await asyncio.sleep(0.15)
 
     if sent_ids:

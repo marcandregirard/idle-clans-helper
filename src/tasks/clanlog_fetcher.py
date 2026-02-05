@@ -7,7 +7,7 @@ import aiohttp
 from discord.ext import tasks
 from sqlalchemy.dialects.postgresql import insert
 
-from src.db import async_session, ClanLog
+from src.db import async_session, ClanLog, parse_log_type
 
 DEFAULT_CLAN_LOG_URL = "https://query.idleclans.com/api/Clan/logs/clan/KlutzCo"
 
@@ -73,6 +73,7 @@ def _parse_messages(data: list[dict]) -> list[dict]:
             "member_username": member_username or "",
             "message": message or "",
             "timestamp": timestamp,
+            "log_type": parse_log_type(message or ""),
         })
     return results
 

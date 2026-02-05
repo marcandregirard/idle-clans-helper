@@ -9,6 +9,7 @@ from sqlalchemy import select, update
 
 from src.db import async_session, ClanLog, ClanLogType
 from src.tasks.gold_donation import check_gold_donation
+from src.tasks.utils import find_channel_by_name
 
 DEFAULT_CHANNEL = "corporate-oversight"
 
@@ -17,13 +18,6 @@ _SKIP_TYPES = {
     ClanLogType.COMBAT_QUEST_COMPLETED,
     ClanLogType.SKILLING_QUEST_COMPLETED,
 }
-
-
-def _find_channel_by_name(client: discord.Client, name: str) -> discord.TextChannel | None:
-    for channel in client.get_all_channels():
-        if isinstance(channel, discord.TextChannel) and channel.name == name:
-            return channel
-    return None
 
 
 def _format_message(msg: ClanLog) -> str:
@@ -35,7 +29,7 @@ def _format_message(msg: ClanLog) -> str:
 
 async def _send_pending(client: discord.Client) -> None:
     channel_name = os.getenv("CLAN_MESSAGE_CHANNEL", DEFAULT_CHANNEL)
-    channel = _find_channel_by_name(client, channel_name)
+    channel = find_channel_by_name(client, channel_name)
     if channel is None:
         logging.warning("[messagesender] channel %s not found", channel_name)
         return

@@ -5,6 +5,8 @@ from zoneinfo import ZoneInfo
 
 import discord
 
+from src.tasks.utils import find_channel_by_name
+
 MEMBER_TO_DISCORD = {
     "ImaKlutz": "ImaKlutz",
     "guildan": "Guildan",
@@ -25,13 +27,6 @@ def _format_amount(n: int) -> str:
     return f"{n:,}"
 
 
-def _find_channel_by_name(client: discord.Client, name: str) -> discord.TextChannel | None:
-    for channel in client.get_all_channels():
-        if isinstance(channel, discord.TextChannel) and channel.name == name:
-            return channel
-    return None
-
-
 async def check_gold_donation(
     client: discord.Client,
     message_text: str,
@@ -47,7 +42,7 @@ async def check_gold_donation(
     if amount < _MIN_AMOUNT:
         return
 
-    channel = _find_channel_by_name(client, "general")
+    channel = find_channel_by_name(client, "general")
     if channel is None:
         logging.warning("[gold_donation] #general channel not found")
         return

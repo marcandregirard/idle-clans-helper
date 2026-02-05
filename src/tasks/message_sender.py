@@ -10,7 +10,7 @@ from sqlalchemy import select, update
 from src.db import async_session, ClanLog
 from src.tasks.gold_donation import check_gold_donation
 
-DEFAULT_CHANNEL = "testing-ground"
+DEFAULT_CHANNEL = "corporate-oversight"
 
 
 def _find_channel_by_name(client: discord.Client, name: str) -> discord.TextChannel | None:
@@ -22,7 +22,8 @@ def _find_channel_by_name(client: discord.Client, name: str) -> discord.TextChan
 
 def _format_message(msg: ClanLog) -> str:
     est = ZoneInfo("America/New_York")
-    est_time = msg.timestamp.astimezone(est)
+    utc_time = msg.timestamp.replace(tzinfo=ZoneInfo("UTC"))
+    est_time = utc_time.astimezone(est)
     return f"`[{est_time.strftime('%b %e %H:%M')}]` {msg.message}"
 
 
@@ -43,23 +44,24 @@ async def _send_pending(client: discord.Client) -> None:
         result = await db.execute(stmt)
         messages = result.scalars().all()
 
-        if not messages:
-            return
+    if not messages:
+        return
 
-        sent_ids: list[int] = []
-        for msg in messages:
-            text = _format_message(msg)
-            try:
-                await channel.send(text)
-            except discord.HTTPException as e:
-                logging.error("[messagesender] failed to send message id=%d: %s", msg.id, e)
-                continue
+    sent_ids: list[int] = []
+    for msg in messages:
+        text = _format_message(msg)
+        try:
+            await channel.send(text)
+        except discord.HTTPException as e:
+            logging.error("[messagesender] failed to send message id=%d: %s", msg.id, e)
+            continue
 
-            sent_ids.append(msg.id)
-            await check_gold_donation(client, msg.message, msg.timestamp)
-            await asyncio.sleep(0.15)
+        sent_ids.append(msg.id)
+        await check_gold_donation(client, msg.message, msg.timestamp)
+        await asyncio.sleep(0.15)
 
-        if sent_ids:
+    if sent_ids:
+        async with async_session() as db:
             await db.execute(
                 update(ClanLog)
                 .where(ClanLog.id.in_(sent_ids))

@@ -21,59 +21,29 @@ def _get_base_url() -> str:
     return url
 
 
-def _parse_timestamp(value) -> datetime | None:
-    if isinstance(value, str):
-        # ISO 8601 / RFC 3339
-        try:
-            return datetime.fromisoformat(value).astimezone(timezone.utc)
-        except ValueError:
-            pass
-        # YYYY-MM-DD HH:MM:SS
-        try:
-            return datetime.strptime(value, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
-        except ValueError:
-            pass
-        # Numeric string (epoch seconds or ms)
-        try:
-            n = int(value)
-            if len(value) == 13:
-                return datetime.fromtimestamp(n / 1000, tz=timezone.utc)
-            return datetime.fromtimestamp(n, tz=timezone.utc)
-        except (ValueError, OSError):
-            pass
-    elif isinstance(value, (int, float)):
-        try:
-            if value > 1e12:
-                return datetime.fromtimestamp(value / 1000, tz=timezone.utc)
-            return datetime.fromtimestamp(int(value), tz=timezone.utc)
-        except (ValueError, OSError):
-            pass
-    return None
+def _parse_timestamp(value: str) -> datetime | None:
+    try:
+        return datetime.fromisoformat(value).astimezone(timezone.utc)
+    except (ValueError, TypeError):
+        return None
 
 
 def _parse_messages(data: list[dict]) -> list[dict]:
     results = []
     for item in data:
-        clan_name = item.get("clanName") or item.get("clan_name")
-        member_username = item.get("memberUsername") or item.get("member_username")
-        message = item.get("message")
-        raw_ts = item.get("timestamp") or item.get("time")
-
-        if not raw_ts:
-            logging.warning("[clanlog] item missing timestamp, skipping")
-            continue
-
-        timestamp = _parse_timestamp(raw_ts)
+        raw_ts = item.get("timestamp")
+        timestamp = _parse_timestamp(raw_ts) if raw_ts else None
         if timestamp is None:
-            logging.warning("[clanlog] failed to parse timestamp: %s", raw_ts)
-            continue
+            logging.warning("[clanlog] missing or unparseable timestamp (%s), using current time", raw_ts)
+            timestamp = datetime.now(timezone.utc)
 
+        message = item.get("message", "")
         results.append({
-            "clan_name": clan_name or "",
-            "member_username": member_username or "",
-            "message": message or "",
+            "clan_name": item.get("clanName", ""),
+            "member_username": item.get("memberUsername", ""),
+            "message": message,
             "timestamp": timestamp,
-            "log_type": parse_log_type(message or ""),
+            "log_type": parse_log_type(message),
         })
     return results
 

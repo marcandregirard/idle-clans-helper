@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from enum import StrEnum
 
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import DateTime, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Base
@@ -46,7 +46,7 @@ class ClanLog(Base):
     clan_name: Mapped[str] = mapped_column(nullable=False)
     member_username: Mapped[str] = mapped_column(nullable=False)
     message: Mapped[str] = mapped_column(nullable=False)
-    timestamp: Mapped[datetime] = mapped_column(nullable=False)
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     message_sent: Mapped[bool] = mapped_column(default=False)
     log_type: Mapped[str] = mapped_column(nullable=False, default=ClanLogType.UNKNOWN)
 

@@ -1,3 +1,4 @@
+import logging
 import os
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -5,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 def _get_url() -> str:
     url = os.getenv("DATABASE_URL", "")
+    logging.info(f"DATABASE_URL: {url}")
     if url.startswith("postgresql://"):
         url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
     return url

@@ -17,6 +17,7 @@ async def boss(
     name: str,
     just_for_me: bool = False,
 ) -> None:
+    logging.info(f"[boss] Processing boss command for boss: {name} from user: {interaction.user} in guild: {interaction.guild}")
     embed = discord.Embed()
     entry = BOSSES_INFORMATION.get(name.lower())
     if entry is None:

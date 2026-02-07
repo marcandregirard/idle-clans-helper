@@ -12,11 +12,13 @@ KEYS_INFORMATION = {entry.key: entry for entry in ALL_BOSSES}
     name="The name of the key you have and will return the boss information.",
     just_for_me="Only show the definition to me. (Default: False)",
 )
-async def boss(
+async def key(
         interaction: discord.Interaction,
         name: str,
         just_for_me: bool = False,
 ) -> None:
+    logging.info(
+        f"[keys] Processing key command for key: {name} from user: {interaction.user} in guild: {interaction.guild}")
     embed = discord.Embed()
     key = KEYS_INFORMATION.get(name.lower())
     if key is None:
@@ -32,8 +34,8 @@ Attack style weakness: ⚔️{key.attack_weakness}"""
     await interaction.response.send_message(embeds=[embed], ephemeral=just_for_me)
 
 
-@boss.autocomplete("name")
-async def boss_autocomplete(
+@key.autocomplete("name")
+async def key_autocomplete(
         interaction: discord.Interaction,
         current: str,
 ) -> list[discord.app_commands.Choice]:

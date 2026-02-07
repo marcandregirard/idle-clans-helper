@@ -67,26 +67,35 @@ async def fetch_and_store(url: str) -> None:
             await asyncio.sleep(backoff)
             backoff *= 2
             continue
+        except Exception as e:
+            logging.error("[clanlog] unexpected error during fetch attempt %d: %s", attempt, e, exc_info=True)
+            await asyncio.sleep(backoff)
+            backoff *= 2
+            continue
 
-        parsed = _parse_messages(data)
+        try:
+            parsed = _parse_messages(data)
 
-        inserted = 0
-        async with async_session() as db:
-            for msg in parsed:
-                stmt = (
-                    insert(ClanLog)
-                    .values(**msg)
-                    .on_conflict_do_nothing(
-                        constraint="uq_clan_log_identity",
+            inserted = 0
+            async with async_session() as db:
+                for msg in parsed:
+                    stmt = (
+                        insert(ClanLog)
+                        .values(**msg)
+                        .on_conflict_do_nothing(
+                            constraint="uq_clan_log_identity",
+                        )
                     )
-                )
-                result = await db.execute(stmt)
-                if result.rowcount:
-                    inserted += 1
-            await db.commit()
+                    result = await db.execute(stmt)
+                    if result.rowcount:
+                        inserted += 1
+                await db.commit()
 
-        logging.info("[clanlog] fetched %d messages from %s, inserted %d", len(parsed), url, inserted)
-        return
+            logging.info("[clanlog] fetched %d messages from %s, inserted %d", len(parsed), url, inserted)
+            return
+        except Exception as e:
+            logging.error("[clanlog] error parsing/storing messages: %s", e, exc_info=True)
+            return
 
     logging.error("[clanlog] all attempts failed for %s", url)
 

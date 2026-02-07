@@ -11,6 +11,22 @@ tree = discord.app_commands.CommandTree(client)
 
 send_messages = create_message_sender(client)
 
+
+@bulk_fetch_clanlog.error
+async def bulk_fetch_error(error: Exception) -> None:
+    logging.error("[bulk_fetch_clanlog] task error: %s", error, exc_info=error)
+
+
+@recent_fetch_clanlog.error
+async def recent_fetch_error(error: Exception) -> None:
+    logging.error("[recent_fetch_clanlog] task error: %s", error, exc_info=error)
+
+
+@send_messages.error
+async def send_messages_error(error: Exception) -> None:
+    logging.error("[send_messages] task error: %s", error, exc_info=error)
+
+
 @client.event
 async def on_ready() -> None:
     logging.info(f"Logged in as {client.user}")
@@ -28,3 +44,12 @@ async def on_ready() -> None:
     await tree.sync()
     logging.info("Synced!")
     logging.info([k.name for k in tree.walk_commands()])
+
+
+@tree.error
+async def on_app_command_error(interaction: discord.Interaction, error: discord.app_commands.AppCommandError) -> None:
+    logging.error("[command] error in %s: %s", interaction.command.name if interaction.command else "unknown", error, exc_info=error)
+    if not interaction.response.is_done():
+        await interaction.response.send_message("An error occurred while processing your command.", ephemeral=True)
+    else:
+        await interaction.followup.send("An error occurred while processing your command.", ephemeral=True)

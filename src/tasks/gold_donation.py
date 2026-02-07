@@ -67,7 +67,9 @@ async def check_gold_donation(
         color=_GOLD_COLOR,
     )
     embed.add_field(name="Amount Donated", value=f"{_format_amount(amount)} Gold", inline=True)
-    embed.set_footer(text=est_time.strftime("%b %e, %Y at %-I:%M %p %Z"))
+    # Cross-platform time formatting (avoid %-I and %e which aren't supported on Windows)
+    footer_text = f"{est_time.strftime('%b')} {est_time.day}, {est_time.year} at {est_time.strftime('%I:%M %p').lstrip('0')} {est_time.strftime('%Z')}"
+    embed.set_footer(text=footer_text)
 
     try:
         await channel.send(embed=embed)

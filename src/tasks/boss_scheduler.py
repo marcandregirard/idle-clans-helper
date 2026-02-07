@@ -93,7 +93,7 @@ async def _delete_previous_message(
     """
     try:
         # Get previous message ID from database
-        prev_message_id = await get_scheduled_message(message_type, channel.id)
+        prev_message_id = await get_scheduled_message(message_type, str(channel.id))
 
         if prev_message_id:
             try:
@@ -119,7 +119,7 @@ async def _delete_previous_message(
                 )
 
             # Always clean up database record, whether deletion succeeded or not
-            await delete_scheduled_message(message_type, channel.id)
+            await delete_scheduled_message(message_type, str(channel.id))
     except Exception as e:
         logging.error(
             "[boss_scheduler] error during message deletion: %s", e, exc_info=True
@@ -154,6 +154,9 @@ async def _post_boss_poll(
 
         # Delete previous message
         await _delete_previous_message(client, channel, message_type)
+
+        # Convert channel ID to string for database storage
+        channel_id_str = str(channel.id)
 
         # Build message content
         message_content, emojis = _build_boss_poll_message(is_weekly)
@@ -204,7 +207,7 @@ async def _post_boss_poll(
                 )
 
         # Store message ID in database
-        await upsert_scheduled_message(message_type, channel.id, str(message.id))
+        await upsert_scheduled_message(message_type, channel_id_str, str(message.id))
 
     except Exception as e:
         logging.error(

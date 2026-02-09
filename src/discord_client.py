@@ -3,6 +3,7 @@ import logging
 
 from src.db import init_db
 from src.tasks.boss_scheduler import create_boss_scheduler
+from src.tasks.boss_summary import create_boss_summary_scheduler
 from src.tasks.clanlog_fetcher import bulk_fetch_clanlog, recent_fetch_clanlog
 from src.tasks.message_sender import create_message_sender
 
@@ -12,6 +13,7 @@ tree = discord.app_commands.CommandTree(client)
 
 send_messages = create_message_sender(client)
 post_boss_poll = create_boss_scheduler(client)
+post_boss_summary = create_boss_summary_scheduler(client)
 
 
 @bulk_fetch_clanlog.error
@@ -34,6 +36,11 @@ async def post_boss_poll_error(error: Exception) -> None:
     logging.error("[post_boss_poll] task error: %s", error, exc_info=error)
 
 
+@post_boss_summary.error
+async def post_boss_summary_error(error: Exception) -> None:
+    logging.error("[post_boss_summary] task error: %s", error, exc_info=error)
+
+
 @client.event
 async def on_ready() -> None:
     logging.info(f"Logged in as {client.user}")
@@ -48,6 +55,8 @@ async def on_ready() -> None:
         send_messages.start()
     if not post_boss_poll.is_running():
         post_boss_poll.start()
+    if not post_boss_summary.is_running():
+        post_boss_summary.start()
     logging.info("Background tasks started")
 
     await tree.sync()

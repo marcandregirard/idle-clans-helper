@@ -8,6 +8,7 @@ logging.basicConfig(level=logging.INFO)
 
 from src.discord_client import *
 from src.commands.boss import *
+from src.commands.boss_summary import *
 from src.commands.keys import *
 from src.commands.market_food import *
 

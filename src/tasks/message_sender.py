@@ -48,6 +48,7 @@ async def _send_pending(client: discord.Client) -> None:
         if not messages:
             return
 
+        logging.info("[messagesender] sending %d pending messages", len(messages))
         sent_ids: list[int] = []
         for msg in messages:
             try:

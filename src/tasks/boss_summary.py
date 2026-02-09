@@ -40,7 +40,7 @@ MEMBER_TO_DISCORD = {
     "Oliiviier": "oli",
 }
 
-MEMBER_TO_DISCORDID = {
+DISCORDID_TO_MEMBER = {
 	270655486318215168:  "ImaKlutz",
 	199632692231274496:   "guildan",
 	409718701236158465: "Charlster",
@@ -147,11 +147,11 @@ def _map_user_ids_to_names(user_ids: set[int], guild: discord.Guild) -> list[str
     """
     names = []
     for user_id in user_ids:
-        if user_id in MEMBER_TO_DISCORDID:
-            if MEMBER_TO_DISCORDID[user_id] in MEMBER_TO_DISCORD:
-                names.append(MEMBER_TO_DISCORD[MEMBER_TO_DISCORDID[user_id]])
+        if user_id in DISCORDID_TO_MEMBER:
+            if DISCORDID_TO_MEMBER[user_id] in MEMBER_TO_DISCORD:
+                names.append(MEMBER_TO_DISCORD[DISCORDID_TO_MEMBER[user_id]])
             else:
-                names.append(MEMBER_TO_DISCORDID[user_id])
+                names.append(DISCORDID_TO_MEMBER[user_id])
         else:
             logging.warning("[boss_summary] unknown user ID %s, skipping", user_id)
     return sorted(names)

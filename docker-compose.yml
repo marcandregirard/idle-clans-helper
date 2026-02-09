@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: klutzco-lil-helper-db
+    environment:
+      POSTGRES_USER: ${DB_USER:-idle_clans}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+      POSTGRES_DB: ${DB_NAME:-idle_clans}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bot-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-idle_clans}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+  bot:
+    build: .
+    container_name: klutzco-lil-helper
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - bot-network
+    restart: unless-stopped
+  watchtower:
+    image: ghcr.io/nicholas-fedor/watchtower:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: >
+      klutzco-lil-helper
+      --interval 300
+      --cleanup
+      --notification-url discord://{DISCORD_WEBHOOK_TOKEN}
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  bot-network:
+    driver: bridge

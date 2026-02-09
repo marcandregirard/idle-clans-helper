@@ -45,7 +45,55 @@ TOKEN=your-bot-token-here
 python main.py
 ```
 
+Docker Deployment
+
+### Prerequisites
+- Docker and Docker Compose installed
+- Discord bot token
+
+### Setup
+
+1. Copy the environment file:
+   ```bash
+   cp .env.docker .env
+   ```
+
+2. Edit `.env` and set your Discord bot token:
+   ```bash
+   TOKEN=your_actual_token_here
+   ```
+
+3. (Optional) Customize other environment variables in `.env` (database credentials, channel names, etc.)
+
+4. Start the bot:
+   ```bash
+   docker-compose up -d
+   ```
+
+5. View logs:
+   ```bash
+   docker-compose logs -f bot
+   ```
+
+6. Stop the bot:
+   ```bash
+   docker-compose down
+   ```
+
+### Database Backup
+
+Backup the database:
+```bash
+docker-compose exec db pg_dump -U idle_clans idle_clans > backup.sql
+```
+
+Restore from backup:
+```bash
+docker-compose exec -T db psql -U idle_clans idle_clans < backup.sql
+```
+
 Notes
 
 - The bot uses guild-registered application commands where available, and syncs commands on startup.
 - The slash commands use ephemeral responses when `just_for_me` is `True` so users can hide the reply.
+- When deploying with Docker, the PostgreSQL database runs in a container with persistent storage.

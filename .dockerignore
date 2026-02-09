@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv
+venv/
+ENV/
+env/
+
+# Environment files (will be provided at runtime)
+.env
+.env.local
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.iml
+.DS_Store
+
+# Documentation
+README.md
+*.md
+
+# CI/CD
+.github/
+
+# Docker
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# Database
+*.db
+*.sqlite
+*.sql
+
+# Logs
+*.log
+
+# Cache
+.cache/
+.ruff_cache/
+.mypy_cache/
+
+# Claude
+.claude/

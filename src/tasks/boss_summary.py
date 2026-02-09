@@ -78,13 +78,13 @@ async def _fetch_poll_message(
     try:
         message_id = await get_scheduled_message(message_type, str(channel.id))
         if not message_id:
-            logging.debug(
+            logging.info(
                 "[boss_summary] no %s poll message found in database", message_type
             )
             return None
 
         message = await channel.fetch_message(int(message_id))
-        logging.debug("[boss_summary] fetched %s poll message %s", message_type, message_id)
+        logging.info("[boss_summary] fetched %s poll message %s", message_type, message_id)
         return message
     except discord.NotFound:
         logging.warning(

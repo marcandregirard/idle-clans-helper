@@ -149,7 +149,7 @@ def _calculate_food_values(price_map: dict[int, float]) -> list[FoodValueResult]
 
         price = price_map.get(item_id)
         if price is None:
-            logging.debug("[market-food] no price data for: %s", food_name)
+            logging.info("[market-food] no price data for: %s", food_name)
             continue
 
         if price <= 0:

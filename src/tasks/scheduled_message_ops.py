@@ -48,7 +48,7 @@ async def upsert_scheduled_message(
             )
             await db.execute(stmt)
             await db.commit()
-            logging.debug(
+            logging.info(
                 "[scheduled_message_ops] upserted %s message for channel %s",
                 message_type,
                 channel_id,
@@ -82,7 +82,7 @@ async def get_scheduled_message(
             result = await db.execute(stmt)
             message_id = result.scalar_one_or_none()
             if message_id:
-                logging.debug(
+                logging.info(
                     "[scheduled_message_ops] found %s message %s in channel %s",
                     message_type,
                     message_id,
@@ -114,7 +114,7 @@ async def delete_scheduled_message(
             )
             await db.execute(stmt)
             await db.commit()
-            logging.debug(
+            logging.info(
                 "[scheduled_message_ops] deleted %s message record for channel %s",
                 message_type,
                 channel_id,

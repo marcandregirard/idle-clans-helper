@@ -40,6 +40,17 @@ MEMBER_TO_DISCORD = {
     "Oliiviier": "oli",
 }
 
+MEMBER_TO_DISCORDID = {
+	270655486318215168:  "ImaKlutz",
+	199632692231274496:   "guildan",
+	409718701236158465: "Charlster",
+	344994648059674624:   "moraxam",
+	448261978469695489:    "yothos",
+	229776173146570755: "Choufleur",
+	298522549661466625:  "g4m3f4c3",
+	350298028902711308: "Oliiviier",
+}
+
 DEFAULT_CHANNEL = "tactical-dispatch"
 DEFAULT_TIME = "9:30"
 
@@ -136,18 +147,13 @@ def _map_user_ids_to_names(user_ids: set[int], guild: discord.Guild) -> list[str
     """
     names = []
     for user_id in user_ids:
-        member = guild.get_member(user_id)
-        if not member:
-            logging.debug("[boss_summary] user ID %s not found in guild", user_id)
-            continue
-
-        # Check if username matches mapping
-        username = member.name
-        if username in MEMBER_TO_DISCORD:
-            names.append(MEMBER_TO_DISCORD[username])
+        if user_id in MEMBER_TO_DISCORDID:
+            if MEMBER_TO_DISCORDID[user_id] in MEMBER_TO_DISCORD:
+                names.append(MEMBER_TO_DISCORD[MEMBER_TO_DISCORDID[user_id]])
+            else:
+                names.append(MEMBER_TO_DISCORDID[user_id])
         else:
-            names.append(member.display_name or member.name)
-
+            logging.warning("[boss_summary] unknown user ID %s, skipping", user_id)
     return sorted(names)
 
 
@@ -239,7 +245,7 @@ def _format_summary_message(boss_data: dict[str, BossParticipation]) -> str:
         if not users:
             continue
 
-        padded_name = name.rjust(max_length)
+        padded_name = name.ljust(max_length)
         user_list = " · ".join(users)
         lines.append(f"{emoji} `{padded_name}:` {user_list}")
 

@@ -13,10 +13,10 @@ from src.db import models  # noqa: F401 -- registers models with Base.metadata
 config = context.config
 
 # Read DATABASE_URL from env. Alembic runs synchronously, so ensure we use
-# the psycopg2 driver (plain "postgresql://"), not asyncpg.
+# the synchronous driver. For SQLite, use "sqlite:///" instead of "sqlite+aiosqlite:///"
 database_url = os.getenv("DATABASE_URL", "")
-if database_url.startswith("postgresql+asyncpg://"):
-    database_url = database_url.replace("postgresql+asyncpg://", "postgresql://", 1)
+if database_url.startswith("sqlite+aiosqlite://"):
+    database_url = database_url.replace("sqlite+aiosqlite://", "sqlite://", 1)
 config.set_main_option("sqlalchemy.url", database_url)
 
 if config.config_file_name is not None:

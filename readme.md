@@ -84,16 +84,17 @@ Docker Deployment
 
 Backup the database:
 ```bash
-docker-compose exec db pg_dump -U idle_clans idle_clans > backup.sql
+docker cp klutzco-lil-helper:/app/data/idle_clans.db ./backup_idle_clans.db
 ```
 
 Restore from backup:
 ```bash
-docker-compose exec -T db psql -U idle_clans idle_clans < backup.sql
+docker cp ./backup_idle_clans.db klutzco-lil-helper:/app/data/idle_clans.db
+docker-compose restart bot
 ```
 
 Notes
 
 - The bot uses guild-registered application commands where available, and syncs commands on startup.
 - The slash commands use ephemeral responses when `just_for_me` is `True` so users can hide the reply.
-- When deploying with Docker, the PostgreSQL database runs in a container with persistent storage.
+- When deploying with Docker, the SQLite database is stored in a persistent volume at `/app/data/idle_clans.db`.

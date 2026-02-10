@@ -1,29 +1,11 @@
 services:
-  db:
-    image: postgres:16-alpine
-    container_name: klutzco-lil-helper-db
-    environment:
-      POSTGRES_USER: ${DB_USER:-idle_clans}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
-      POSTGRES_DB: ${DB_NAME:-idle_clans}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - bot-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-idle_clans}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
   bot:
     build: .
     container_name: klutzco-lil-helper
-    depends_on:
-      db:
-        condition: service_healthy
     env_file:
       - .env
+    volumes:
+      - bot_data:/app/data
     networks:
       - bot-network
     restart: unless-stopped
@@ -37,7 +19,7 @@ services:
       --cleanup
       --notification-url discord://{DISCORD_WEBHOOK_TOKEN}
 volumes:
-  postgres_data:
+  bot_data:
     driver: local
 
 networks:

@@ -1,6 +1,6 @@
 from .base import Base
 from .engine import async_session, engine, init_db
-from .models import ClanLog, ClanLogType, MessageType, ScheduledMessage, parse_log_type
+from .models import ClanLog, ClanLogType, MessageType, PlayerXpSnapshot, ScheduledMessage, parse_log_type
 
 __all__ = [
     "Base",
@@ -10,6 +10,7 @@ __all__ = [
     "ClanLog",
     "ClanLogType",
     "MessageType",
+    "PlayerXpSnapshot",
     "ScheduledMessage",
     "parse_log_type",
 ]

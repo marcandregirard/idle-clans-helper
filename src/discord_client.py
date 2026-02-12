@@ -6,6 +6,7 @@ from src.tasks.boss_scheduler import create_boss_scheduler
 from src.tasks.boss_summary import create_boss_summary_scheduler
 from src.tasks.clanlog_fetcher import bulk_fetch_clanlog, recent_fetch_clanlog
 from src.tasks.message_sender import create_message_sender
+from src.tasks.xp_fetcher import fetch_player_xp
 
 
 client = discord.Client(intents=discord.Intents.default())
@@ -41,6 +42,11 @@ async def post_boss_summary_error(error: Exception) -> None:
     logging.error("[post_boss_summary] task error: %s", error, exc_info=error)
 
 
+@fetch_player_xp.error
+async def fetch_player_xp_error(error: Exception) -> None:
+    logging.error("[fetch_player_xp] task error: %s", error, exc_info=error)
+
+
 @client.event
 async def on_ready() -> None:
     logging.info(f"Logged in as {client.user}")
@@ -57,6 +63,8 @@ async def on_ready() -> None:
         post_boss_poll.start()
     if not post_boss_summary.is_running():
         post_boss_summary.start()
+    if not fetch_player_xp.is_running():
+        fetch_player_xp.start()
     logging.info("Background tasks started")
 
     await tree.sync()

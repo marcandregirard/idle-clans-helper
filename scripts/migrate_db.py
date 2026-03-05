@@ -23,18 +23,18 @@ from src.db.models.clanlog import parse_log_type
 
 
 def migrate_clan_logs(old_conn: sqlite3.Connection, new_conn: sqlite3.Connection) -> int:
-    """Migrate clan_logs table, parsing log_type from message content."""
+    """Migrate clan_messages table, parsing log_type from message content."""
     old_cursor = old_conn.cursor()
     new_cursor = new_conn.cursor()
 
     # Check columns in old table
-    old_cursor.execute("PRAGMA table_info(clan_logs)")
+    old_cursor.execute("PRAGMA table_info(clan_messages)")
     old_columns = {row[1] for row in old_cursor.fetchall()}
     has_log_type = "log_type" in old_columns
 
     # Fetch all rows from old DB
     old_cursor.execute(
-        "SELECT id, clan_name, member_username, message, timestamp, message_sent FROM clan_logs"
+        "SELECT id, clan_name, member_username, message, timestamp, message_sent FROM clan_messages"
     )
     rows = old_cursor.fetchall()
 

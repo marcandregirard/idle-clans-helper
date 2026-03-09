@@ -8,7 +8,7 @@ import logging
 from datetime import datetime, timezone
 
 from sqlalchemy import delete, select
-from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.dialects.sqlite import insert
 
 from src.db import MessageType, ScheduledMessage, async_session
 

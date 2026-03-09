@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 
 import aiohttp
 from discord.ext import tasks
-from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.dialects.sqlite import insert
 
 from src.db import async_session, ClanLog, ClanLogType, parse_log_type
 

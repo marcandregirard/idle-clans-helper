@@ -20,19 +20,19 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     op.rename_table("clan_messages", "clan_logs")
-    op.drop_constraint("uq_clan_message_identity", "clan_logs", type_="unique")
-    op.create_unique_constraint(
-        "uq_clan_log_identity",
-        "clan_logs",
-        ["clan_name", "member_username", "message", "timestamp"],
-    )
+    with op.batch_alter_table("clan_logs") as batch_op:
+        batch_op.drop_constraint("uq_clan_message_identity", type_="unique")
+        batch_op.create_unique_constraint(
+            "uq_clan_log_identity",
+            ["clan_name", "member_username", "message", "timestamp"],
+        )
 
 
 def downgrade() -> None:
-    op.drop_constraint("uq_clan_log_identity", "clan_logs", type_="unique")
-    op.create_unique_constraint(
-        "uq_clan_message_identity",
-        "clan_logs",
-        ["clan_name", "member_username", "message", "timestamp"],
-    )
+    with op.batch_alter_table("clan_logs") as batch_op:
+        batch_op.drop_constraint("uq_clan_log_identity", type_="unique")
+        batch_op.create_unique_constraint(
+            "uq_clan_message_identity",
+            ["clan_name", "member_username", "message", "timestamp"],
+        )
     op.rename_table("clan_logs", "clan_messages")

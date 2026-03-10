@@ -2,10 +2,11 @@ services:
   bot:
     build: .
     container_name: klutzco-lil-helper
+    image: ghcr.io/marcandregirard/idle-clans-helper:main
     env_file:
       - .env
     volumes:
-      - bot_data:/app/data
+      - ./data:/app/data
     networks:
       - bot-network
     restart: unless-stopped
@@ -18,9 +19,6 @@ services:
       --interval 300
       --cleanup
       --notification-url discord://{DISCORD_WEBHOOK_TOKEN}
-volumes:
-  bot_data:
-    driver: local
 
 networks:
   bot-network:

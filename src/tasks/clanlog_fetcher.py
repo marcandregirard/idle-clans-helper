@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 
 import aiohttp
 from discord.ext import tasks
-from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.dialects.sqlite import insert
 
 from src.db import async_session, ClanLog, ClanLogType, parse_log_type
 
@@ -86,7 +86,7 @@ async def fetch_and_store(url: str) -> None:
                         insert(ClanLog)
                         .values(**msg)
                         .on_conflict_do_nothing(
-                            constraint="uq_clan_log_identity",
+                            index_elements=["clan_name", "member_username", "message", "timestamp"],
                         )
                     )
                     result = await db.execute(stmt)

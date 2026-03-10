@@ -1,11 +1,35 @@
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import StrEnum
 
-from sqlalchemy import DateTime, UniqueConstraint
+from sqlalchemy import String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.types import TypeDecorator
 
 from ..base import Base
+
+
+class UTCISODateTime(TypeDecorator):
+    """Stores datetimes as 'YYYY-MM-DDTHH:MM:SSZ' text in SQLite.
+
+    Matches the format written by the Go bot so the unique constraint
+    deduplicates correctly via SQLite text comparison.
+    """
+
+    impl = String
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return None
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return None
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
 class ClanLogType(StrEnum):
@@ -49,7 +73,7 @@ class ClanLog(Base):
     clan_name: Mapped[str] = mapped_column(nullable=False)
     member_username: Mapped[str] = mapped_column(nullable=False)
     message: Mapped[str] = mapped_column(nullable=False)
-    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    timestamp: Mapped[datetime] = mapped_column(UTCISODateTime, nullable=False)
     message_sent: Mapped[bool] = mapped_column(default=False)
     log_type: Mapped[str] = mapped_column(nullable=False, default=ClanLogType.UNKNOWN)
 

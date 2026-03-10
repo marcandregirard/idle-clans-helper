@@ -24,6 +24,8 @@ from src.tasks.utils import find_channel_by_name
 # Boss emoji constants
 BOSS_EMOJIS = ["🐔", "😈", "👹", "⚡", "🦁", "🐍"]
 BOSS_NAMES = ["Griffin", "Hades", "Devil", "Zeus", "Chimera", "Medusa"]
+WEEKLY_BOSS_EMOJIS = ["⏳", "🐊", "🐉"]
+WEEKLY_BOSS_NAMES = ["Kronos", "Sobek", "Messines"]
 GEM_EMOJI = "💎"
 
 DEFAULT_CHANNEL = "tactical-dispatch"
@@ -65,8 +67,9 @@ def _build_boss_poll_message(is_weekly: bool) -> tuple[str, list[str]]:
     # Build boss list with emojis
     boss_lines = [f"{emoji} {name}" for emoji, name in zip(BOSS_EMOJIS, BOSS_NAMES)]
 
-    # Add gem quest for weekly polls
+    # Add weekly bosses and gem quest for weekly polls
     if is_weekly:
+        boss_lines += [f"{emoji} {name}" for emoji, name in zip(WEEKLY_BOSS_EMOJIS, WEEKLY_BOSS_NAMES)]
         boss_lines.append(f"{GEM_EMOJI} Gem quest")
 
     message = f"{title}\n\n" + "\n".join(boss_lines)
@@ -74,6 +77,7 @@ def _build_boss_poll_message(is_weekly: bool) -> tuple[str, list[str]]:
     # Build emoji list for reactions
     emojis = BOSS_EMOJIS.copy()
     if is_weekly:
+        emojis += WEEKLY_BOSS_EMOJIS
         emojis.append(GEM_EMOJI)
 
     return message, emojis
@@ -154,6 +158,10 @@ async def _post_boss_poll(
 
         # Delete previous message
         await _delete_previous_message(client, channel, message_type)
+
+        # We remove the summary every time to ensure it doesn't get out of sync with the polls, but we only want to delete the summary once per day (not for weekly polls) to avoid deleting it twice on Mondays.
+        if not is_weekly:
+            await _delete_previous_message(client, channel, MessageType.BOSS_SUMMARY)
 
         # Convert channel ID to string for database storage
         channel_id_str = str(channel.id)

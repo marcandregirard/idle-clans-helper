@@ -20,13 +20,15 @@ from src.tasks.scheduled_message_ops import (
     get_scheduled_message,
     upsert_scheduled_message,
 )
+from src.tasks.boss_constants import (
+    BOSS_EMOJIS,
+    BOSS_NAMES,
+    GEM_EMOJI,
+    GEM_NAME,
+    WEEKLY_BOSS_EMOJIS,
+    WEEKLY_BOSS_NAMES,
+)
 from src.tasks.utils import find_channel_by_name
-
-# Boss emoji constants (shared with boss_scheduler.py)
-BOSS_EMOJIS = ["🐔", "😈", "👹", "⚡", "🦁", "🐍"]
-BOSS_NAMES = ["Griffin", "Hades", "Devil", "Zeus", "Chimera", "Medusa"]
-GEM_EMOJI = "💎"
-GEM_NAME = "Gem Quest"
 
 # Member mapping (Discord username → Display name)
 MEMBER_TO_DISCORD = {
@@ -208,14 +210,24 @@ async def _collect_boss_data(
             daily_users=set(), weekly_users=set(gem_names)
         )
 
+    # Collect reactions for weekly-only bosses (Kronos, Sobek, Messines)
+    if weekly_message:
+        for emoji, name in zip(WEEKLY_BOSS_EMOJIS, WEEKLY_BOSS_NAMES):
+            user_ids = await _get_reactions_for_emoji(weekly_message, emoji)
+            names = _map_user_ids_to_names(user_ids, guild)
+            boss_data[name] = BossParticipation(
+                daily_users=set(), weekly_users=set(names)
+            )
+
     return boss_data
 
 
-def _format_summary_message(boss_data: dict[str, BossParticipation]) -> str:
+def _format_summary_message(boss_data: dict[str, BossParticipation], skip_weekly: bool) -> str:
     """Format boss participation data into a summary message.
 
     Args:
         boss_data: Dictionary mapping boss names to BossParticipation objects
+        skip_weekly: Whether you skip weekly only participant or weekly only bosses (controls weekly-only boss visibility)
 
     Returns:
         Formatted message string
@@ -223,12 +235,16 @@ def _format_summary_message(boss_data: dict[str, BossParticipation]) -> str:
     lines = ["Today's boss fight summaries:", ""]
 
     # Find max boss name length for alignment
-    max_length = max(len(name) for name in BOSS_NAMES + [GEM_NAME])
+    max_length = max(len(name) for name in BOSS_NAMES + WEEKLY_BOSS_NAMES + [GEM_NAME])
 
     # Format regular bosses
     for emoji, name in zip(BOSS_EMOJIS, BOSS_NAMES):
         participation = boss_data.get(name)
         if not participation:
+            continue
+
+        # Skip if all participants are weekly-only
+        if not skip_weekly and not participation.daily_users:
             continue
 
         # Users who reacted on daily poll (with or without weekly) - no suffix
@@ -257,6 +273,17 @@ def _format_summary_message(boss_data: dict[str, BossParticipation]) -> str:
             padded_name = GEM_NAME.rjust(max_length)
             user_list = " · ".join(sorted(participation.weekly_users))
             lines.append(f"{GEM_EMOJI} `{padded_name}:` {user_list}")
+
+    # Weekly-only bosses shown only on Fridays
+    if skip_weekly:
+        for emoji, name in zip(WEEKLY_BOSS_EMOJIS, WEEKLY_BOSS_NAMES):
+            participation = boss_data.get(name)
+            if not participation or not participation.weekly_users:
+                continue
+            lines.append("")
+            padded_name = name.ljust(max_length)
+            user_list = " · ".join(sorted(participation.weekly_users))
+            lines.append(f"{emoji} `{padded_name}:` {user_list}")
 
     return "\n".join(lines)
 
@@ -339,8 +366,12 @@ async def _regenerate_boss_summary(client: discord.Client) -> None:
         # Collect boss data from polls
         boss_data = await _collect_boss_data(channel, guild)
 
+        # Determine if today is Friday (weekly bosses shown on Fridays only)
+        now = datetime.datetime.now(ZoneInfo("America/New_York"))
+        is_friday = now.weekday() == 4
+
         # Format summary message
-        content = _format_summary_message(boss_data)
+        content = _format_summary_message(boss_data, is_friday)
 
         # Post or update summary
         await _post_or_update_summary(client, channel, content)

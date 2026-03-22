@@ -19,14 +19,14 @@ from src.tasks.scheduled_message_ops import (
     get_scheduled_message,
     upsert_scheduled_message,
 )
+from src.tasks.boss_constants import (
+    BOSS_EMOJIS,
+    BOSS_NAMES,
+    GEM_EMOJI,
+    WEEKLY_BOSS_EMOJIS,
+    WEEKLY_BOSS_NAMES,
+)
 from src.tasks.utils import find_channel_by_name
-
-# Boss emoji constants
-BOSS_EMOJIS = ["🐔", "😈", "👹", "⚡", "🦁", "🐍"]
-BOSS_NAMES = ["Griffin", "Hades", "Devil", "Zeus", "Chimera", "Medusa"]
-WEEKLY_BOSS_EMOJIS = ["⏳", "🐊", "🐉"]
-WEEKLY_BOSS_NAMES = ["Kronos", "Sobek", "Messines"]
-GEM_EMOJI = "💎"
 
 DEFAULT_CHANNEL = "tactical-dispatch"
 

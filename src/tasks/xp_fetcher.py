@@ -12,6 +12,8 @@ FETCH_TIMES = [time(hour=h, tzinfo=EST) for h in (0, 6, 12, 18)]
 from src.db import async_session
 from src.db.models import PlayerXpSnapshot
 
+_SNAPSHOT_COLUMNS = {c.key for c in PlayerXpSnapshot.__table__.columns}
+
 PLAYER_NAMES = (
     "yothos",
     "guildan",
@@ -75,12 +77,13 @@ async def fetch_player_xp() -> None:
                 continue
 
             try:
+                filtered_xp = {k: v for k, v in skill_xp.items() if k in _SNAPSHOT_COLUMNS}
                 async with async_session() as db:
                     db.add(
                         PlayerXpSnapshot(
                             player_name=player_name,
                             fetched_at=fetched_at,
-                            **skill_xp,
+                            **filtered_xp,
                         )
                     )
                     await db.commit()

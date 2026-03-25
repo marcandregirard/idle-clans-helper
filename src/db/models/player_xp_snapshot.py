@@ -42,6 +42,7 @@ class PlayerXpSnapshot(Base):
     # Other skills
     agility: Mapped[int] = mapped_column(BigInteger, nullable=False)
     plundering: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    invocation: Mapped[int] = mapped_column(BigInteger, nullable=False)
 
     __table_args__ = (
         Index("ix_player_xp_snapshot_player_time", "player_name", "fetched_at"),

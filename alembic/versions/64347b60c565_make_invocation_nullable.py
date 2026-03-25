@@ -19,8 +19,12 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    if op.get_bind().dialect.name == "sqlite":
+        return
     op.alter_column('player_xp_snapshots', 'invocation', existing_type=sa.BigInteger(), nullable=True)
 
 
 def downgrade() -> None:
+    if op.get_bind().dialect.name == "sqlite":
+        return
     op.alter_column('player_xp_snapshots', 'invocation', existing_type=sa.BigInteger(), nullable=False)

@@ -4,6 +4,7 @@ Provides /boss_poll command to manually re-post the daily and/or weekly boss pol
 Restricted to server administrators.
 """
 
+import asyncio
 import logging
 
 import discord
@@ -27,10 +28,12 @@ async def boss_poll(interaction: discord.Interaction, poll_type: app_commands.Ch
     await interaction.response.defer(ephemeral=True)
 
     try:
-        if poll_type.value in ("daily", "both"):
-            await _post_boss_poll(interaction.client, is_weekly=False)
         if poll_type.value in ("weekly", "both"):
             await _post_boss_poll(interaction.client, is_weekly=True)
+        if poll_type.value == "both":
+            await asyncio.sleep(1)
+        if poll_type.value in ("daily", "both"):
+            await _post_boss_poll(interaction.client, is_weekly=False)
         await interaction.followup.send(
             f"✅ Boss poll ({poll_type.value}) has been re-posted!",
             ephemeral=True,

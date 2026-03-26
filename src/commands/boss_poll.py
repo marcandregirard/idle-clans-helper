@@ -14,7 +14,7 @@ from src.discord_client import tree
 
 
 @tree.command(name="boss_poll", description="Re-post the boss poll (admin only)")
-@app_commands.default_permissions(administrator=True)
+#@app_commands.default_permissions(administrator=True)
 @app_commands.describe(poll_type="Which poll to re-post")
 @app_commands.choices(poll_type=[
     app_commands.Choice(name="daily", value="daily"),

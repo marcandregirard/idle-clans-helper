@@ -20,7 +20,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Upgrade schema."""
-    op.add_column('player_xp_snapshots', sa.Column('invocation', sa.BigInteger(), nullable=False))
+    op.add_column('player_xp_snapshots', sa.Column('invocation', sa.BigInteger(), nullable=True))
 
 
 def downgrade() -> None:

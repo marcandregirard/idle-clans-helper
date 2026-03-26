@@ -19,10 +19,8 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    with op.batch_alter_table('player_xp_snapshots') as batch_op:
-        batch_op.alter_column('invocation', existing_type=sa.BigInteger(), nullable=True)
+    pass  # invocation was already added as nullable in cf87d76be25c
 
 
 def downgrade() -> None:
-    with op.batch_alter_table('player_xp_snapshots') as batch_op:
-        batch_op.alter_column('invocation', existing_type=sa.BigInteger(), nullable=False)
+    pass

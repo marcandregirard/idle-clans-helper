@@ -49,7 +49,7 @@ _TYPE_PATTERNS: list[tuple[re.Pattern, ClanLogType]] = [
     (re.compile(r"completed a combat quest"), ClanLogType.COMBAT_QUEST_COMPLETED),
     (re.compile(r"completed a skilling quest"), ClanLogType.SKILLING_QUEST_COMPLETED),
     (re.compile(r"completed a daily combat quest"), ClanLogType.COMBAT_QUEST_COMPLETED),
-    (re.compile(r"bought the upgrade Gatherers"), ClanLogType.CLAN_UPGRADE),
+    (re.compile(r"bought the upgrade"), ClanLogType.CLAN_UPGRADE),
     (re.compile(r"added \d+x .+\.$"), ClanLogType.VAULT_DEPOSIT),
     (re.compile(r"withdrew \d+x .+\.$"), ClanLogType.VAULT_WITHDRAWAL),
     (re.compile(r"has joined the clan:"), ClanLogType.MEMBER_JOINED),

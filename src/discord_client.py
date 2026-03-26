@@ -68,6 +68,7 @@ async def on_ready() -> None:
     logging.info("Background tasks started")
 
     await tree.sync()
+    await tree.sync(guild=discord.Object(id=1450496117878821058))#syncing to klutzco server
     logging.info("Synced!")
     logging.info([k.name for k in tree.walk_commands()])
 

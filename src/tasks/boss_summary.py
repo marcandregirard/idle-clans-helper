@@ -243,10 +243,6 @@ def _format_summary_message(boss_data: dict[str, BossParticipation], skip_weekly
         if not participation:
             continue
 
-        # Skip if all participants are weekly-only
-        if not skip_weekly and not participation.daily_users:
-            continue
-
         # Users who reacted on daily poll (with or without weekly) - no suffix
         daily_reactors = sorted(participation.daily_users)
 
